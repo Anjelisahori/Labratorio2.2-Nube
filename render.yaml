@@ -1,44 +1,27 @@
 services:
   - type: web
     name: laravel-app
-    runtime: php
+    env: docker
+    branch: main
     plan: free
-    buildCommand: |
-      composer install
-      php artisan key:generate
-      php artisan migrate --force
-    startCommand: php artisan serve --host 0.0.0.0 --port 10000
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
     envVars:
       - key: APP_ENV
         value: production
-      - key: APP_KEY
-        generateValue: true
       - key: APP_DEBUG
-        value: false
+        value: "false"
       - key: APP_URL
         value: https://laravel-app.onrender.com
+      - key: APP_KEY
+        sync: false
       - key: DB_CONNECTION
         value: pgsql
-      - key: DB_HOST
+      - key: DATABASE_URL
         fromDatabase:
           name: laravel-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: laravel-db
-          property: port
-      - key: DB_DATABASE
-        fromDatabase:
-          name: laravel-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: laravel-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: laravel-db
-          property: password
+          property: connectionString
+    # preDeployCommand: "php artisan migrate --force"  # opcional; lo activaremos después si lo deseas
 
 databases:
   - name: laravel-db
